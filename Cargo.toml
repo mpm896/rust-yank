@@ -6,4 +6,6 @@ edition = "2024"
 [dependencies]
 active-win-pos-rs = "0.9.0"
 cocoa = "0.26.0"
+device_query = "3.0.1"
+get-selected-text = "0.1.6"
 objc = "0.2.7"
