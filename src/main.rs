@@ -33,13 +33,20 @@ extern "C" fn application_did_finish_launching(this: &mut Object, _sel: Sel, _no
     };
 
     let device_state = DeviceState::new();
-        
-    let interval = time::Duration::from_millis(10);
     let mut left_click = device_state.query_pointer().button_pressed[1];
     let mut text: String = String::new();
     let mut old_text: String = String::new();
 
-    loop {
+    thread::spawn(move || loop {
+        match get_active_window() {
+            Ok(window) => {
+                // println!("Active window: {:?}", window);
+            }
+            Err(_e) => {
+                println!("No active window");
+            }
+        };
+
         left_click = device_state.query_pointer().button_pressed[1];  // bool if left click is pressed
 
         while left_click {
@@ -48,46 +55,15 @@ extern "C" fn application_did_finish_launching(this: &mut Object, _sel: Sel, _no
                 text = selection;
             }
         }
-
+        
         if !old_text.eq(&text) && text.len() > 0 {
             println!("Selected text: {text}");
             old_text = text.clone();
-            println!("Text: {text}");
         }
 
-        thread::sleep(interval);
-    }
-    // thread::spawn(move || loop {
-    //     left_click = device_state.query_pointer().button_pressed[1];  // bool if left click is pressed
+        thread::sleep(time::Duration::from_millis(1));
+    });
 
-    //     match get_active_window() {
-    //         Ok(window) => {
-    //             // println!("Active window: {:?}", window);
-    //             continue
-    //         }
-    //         Err(_e) => {
-    //             println!("No active window");
-    //         }
-    //     };
-
-    //     println!("Hello");
-
-    //     while left_click {
-    //         left_click = device_state.query_pointer().button_pressed[1];
-    //         if let Ok(selection) = get_selected_text() {
-    //             text = selection;
-    //         }
-    //         println!("Left clicking");
-    //     }
-
-    //     if !old_text.eq(&text) && text.len() > 0 {
-    //         println!("Selected text: {text}");
-    //         old_text = text.clone();
-    //         println!("Text: {text}");
-    //     }
-
-    //     thread::sleep(interval);
-    // });
 }
 
 extern "C" fn handle_workspace_app_activated(_this: &mut Object, _sel: Sel, _notif: *mut Object) {
